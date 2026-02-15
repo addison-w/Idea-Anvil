@@ -89,3 +89,12 @@ def test_pivot_record():
         timestamp=datetime.now(),
     )
     assert record.from_idea != record.to_idea
+
+
+def test_search_query_product_hunt():
+    query = SearchQuery(
+        source="product_hunt",
+        query="AI todo",
+        intent="Find competing products on Product Hunt",
+    )
+    assert query.source == "product_hunt"

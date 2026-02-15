@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 from agents.tools.hn import search_hacker_news
 from agents.tools.reddit import search_reddit
 from agents.tools.tavily_search import search_tavily
+from agents.tools.producthunt import search_product_hunt
 
 
 def test_search_hacker_news_returns_results():
@@ -73,3 +74,37 @@ def test_search_tavily_returns_results():
         results = search_tavily("AI todo app review")
         assert len(results) == 1
         assert results[0]["title"] == "AI Todo Apps Review"
+
+
+def test_search_product_hunt_returns_results():
+    mock_response = {
+        "data": {
+            "search": {
+                "edges": [
+                    {
+                        "node": {
+                            "id": "123",
+                            "name": "AI Todo Pro",
+                            "tagline": "AI-powered task management",
+                            "url": "https://www.producthunt.com/posts/ai-todo-pro",
+                            "votesCount": 250,
+                            "commentsCount": 30,
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    with patch("agents.tools.producthunt.httpx.post") as mock_post:
+        mock_post.return_value = MagicMock(status_code=200, json=lambda: mock_response)
+        results = search_product_hunt("AI todo")
+        assert len(results) == 1
+        assert results[0]["title"] == "AI Todo Pro"
+        assert results[0]["votes"] == 250
+
+
+def test_search_product_hunt_handles_error():
+    with patch("agents.tools.producthunt.httpx.post") as mock_post:
+        mock_post.side_effect = Exception("Network error")
+        results = search_product_hunt("AI todo")
+        assert results == []

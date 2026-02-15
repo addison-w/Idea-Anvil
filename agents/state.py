@@ -21,7 +21,7 @@ class RefinedIdea(BaseModel):
 
 
 class SearchQuery(BaseModel):
-    source: Literal["hacker_news", "reddit", "tavily"]
+    source: Literal["hacker_news", "reddit", "tavily", "product_hunt"]
     query: str
     intent: str
 
