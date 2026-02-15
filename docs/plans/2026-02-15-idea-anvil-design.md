@@ -1,4 +1,4 @@
-# IdeaForge — Design Document
+# Idea Anvil — Design Document
 
 AI-powered idea-to-PRD platform. Takes a rough product idea, validates it through multi-source research (Hacker News, Reddit, Tavily), and produces an implementation-ready PRD in Markdown.
 
@@ -6,7 +6,7 @@ AI-powered idea-to-PRD platform. Takes a rough product idea, validates it throug
 
 **One-liner**: Turn rough ideas into validated, implementation-ready PRDs.
 
-**Differentiation**: Existing PRD tools (ChatPRD, PRDKit) don't validate ideas against real-world data. Validation tools (ValidIQ) don't produce PRDs. IdeaForge is the first to combine both — research-backed PRD generation in a single flow.
+**Differentiation**: Existing PRD tools (ChatPRD, PRDKit) don't validate ideas against real-world data. Validation tools (ValidIQ) don't produce PRDs. Idea Anvil is the first to combine both — research-backed PRD generation in a single flow.
 
 **Target users**: Developers and indie hackers (MVP primary), product managers and non-technical founders (future).
 
@@ -124,7 +124,7 @@ When user says "actually, B2B is better than B2C" during review:
 ## State Schema
 
 ```python
-class IdeaForgeState(TypedDict):
+class Idea AnvilState(TypedDict):
     # Core conversation
     messages: Annotated[list[AnyMessage], add_messages]
 
@@ -251,7 +251,7 @@ Only color exception: Amber (`#f59e0b`) for pivot/warning semantic signals. Ever
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  IdeaForge                                         [History] [⚙]   │
+│  Idea Anvil                                         [History] [⚙]   │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  ┌─ Chat Area (main) ──────────────────┐  ┌─ Research Panel ────┐  │
@@ -347,7 +347,7 @@ model = init_chat_model(
 ## Project Structure
 
 ```
-ideaforge/
+idea-anvil/
 ├── pyproject.toml
 ├── .env.example
 ├── docker-compose.yml
@@ -364,7 +364,7 @@ ideaforge/
 │
 ├── agents/
 │   ├── graph.py                    # Top-level PRD Director graph
-│   ├── state.py                    # IdeaForgeState + Pydantic models
+│   ├── state.py                    # Idea AnvilState + Pydantic models
 │   ├── config.py                   # PRDConfig, model config
 │   ├── nodes/
 │   │   ├── clarifier.py            # Clarifier agent
