@@ -123,7 +123,7 @@ git commit -m "feat: project scaffolding with pyproject.toml and dependencies"
 ```python
 # tests/unit/test_state.py
 from agents.state import (
-    Idea AnvilState,
+    IdeaAnvilState,
     RefinedIdea,
     SearchQuery,
     SourceResult,
@@ -334,7 +334,7 @@ class PivotRecord(BaseModel):
 from typing import TypedDict
 
 
-class Idea AnvilState(TypedDict):
+class IdeaAnvilState(TypedDict):
     """Top-level graph state for Idea Anvil."""
 
     # Core conversation
@@ -390,18 +390,18 @@ git commit -m "feat: state schema and Pydantic models for Idea Anvil"
 
 ```python
 # tests/unit/test_config.py
-from agents.config import get_model, Idea AnvilConfig
+from agents.config import get_model, IdeaAnvilConfig
 
 
 def test_config_defaults():
-    config = Idea AnvilConfig()
+    config = IdeaAnvilConfig()
     assert config.model_provider == "zhipuai"
     assert config.model_name == "glm-5"
     assert config.temperature == 0.7
 
 
 def test_config_custom():
-    config = Idea AnvilConfig(model_provider="openai", model_name="gpt-4o", temperature=0.3)
+    config = IdeaAnvilConfig(model_provider="openai", model_name="gpt-4o", temperature=0.3)
     assert config.model_provider == "openai"
     assert config.temperature == 0.3
 ```
@@ -426,7 +426,7 @@ from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
 
 
-class Idea AnvilConfig(BaseModel):
+class IdeaAnvilConfig(BaseModel):
     """Configuration for Idea Anvil."""
 
     model_provider: str = "zhipuai"
@@ -436,9 +436,9 @@ class Idea AnvilConfig(BaseModel):
     max_pivot_count: int = 3
 
 
-def get_model(config: Idea AnvilConfig | None = None) -> BaseChatModel:
+def get_model(config: IdeaAnvilConfig | None = None) -> BaseChatModel:
     """Initialize chat model based on config."""
-    config = config or Idea AnvilConfig()
+    config = config or IdeaAnvilConfig()
     return init_chat_model(
         model=config.model_name,
         model_provider=config.model_provider,
@@ -715,7 +715,7 @@ from agents.nodes.searchers import searcher_node
 from agents.nodes.synthesizer import synthesizer_node
 from agents.nodes.writer import writer_node
 from agents.nodes.reviewer import reviewer_node
-from agents.state import Idea AnvilState, PRDConfig, SourceResult, SearchQuery
+from agents.state import IdeaAnvilState, PRDConfig, SourceResult, SearchQuery
 from datetime import datetime
 
 
@@ -778,7 +778,7 @@ Expected: FAIL with import error
 
 **Step 3: Write implementations**
 
-Each node follows the pattern: takes `state: Idea AnvilState` → returns partial state update dict. Nodes that need LLM call `get_model()` from config. Full prompt engineering and implementation details for each node below.
+Each node follows the pattern: takes `state: IdeaAnvilState` → returns partial state update dict. Nodes that need LLM call `get_model()` from config. Full prompt engineering and implementation details for each node below.
 
 ```python
 # agents/nodes/__init__.py
@@ -794,7 +794,7 @@ from langchain_core.messages import AIMessage, SystemMessage
 from langgraph.types import interrupt
 
 from agents.config import get_model
-from agents.state import Idea AnvilState, RefinedIdea
+from agents.state import IdeaAnvilState, RefinedIdea
 
 CLARIFIER_SYSTEM = """You are a sharp product manager helping refine a rough product idea.
 
@@ -820,7 +820,7 @@ When ready, output EXACTLY this format:
 """
 
 
-def clarifier_node(state: Idea AnvilState) -> dict:
+def clarifier_node(state: IdeaAnvilState) -> dict:
     """Ask one clarifying question or produce refined idea."""
     model = get_model()
     messages = [SystemMessage(content=CLARIFIER_SYSTEM)] + state["messages"]
@@ -862,7 +862,7 @@ import json
 
 from langchain_core.messages import AIMessage, SystemMessage
 from agents.config import get_model
-from agents.state import Idea AnvilState, SearchQuery
+from agents.state import IdeaAnvilState, SearchQuery
 
 PLANNER_SYSTEM = """You are a research strategist. Given a refined product idea, generate search queries for market research.
 
@@ -885,7 +885,7 @@ Guidelines:
 """
 
 
-def planner_node(state: Idea AnvilState) -> dict:
+def planner_node(state: IdeaAnvilState) -> dict:
     """Generate search queries based on refined idea."""
     model = get_model()
     refined = state["refined_idea"]
@@ -994,7 +994,7 @@ import json
 
 from langchain_core.messages import SystemMessage
 from agents.config import get_model
-from agents.state import Idea AnvilState, ResearchInsights
+from agents.state import IdeaAnvilState, ResearchInsights
 
 SYNTHESIZER_SYSTEM = """You are a market research analyst. Analyze search results from multiple sources and extract insights.
 
@@ -1013,7 +1013,7 @@ Output EXACTLY this JSON format:
 Be specific. Cite sources when possible. Focus on actionable insights."""
 
 
-def synthesizer_node(state: Idea AnvilState) -> dict:
+def synthesizer_node(state: IdeaAnvilState) -> dict:
     """Synthesize all research results into insights."""
     model = get_model()
 
@@ -1074,7 +1074,7 @@ from __future__ import annotations
 
 from langchain_core.messages import SystemMessage
 from agents.config import get_model
-from agents.state import Idea AnvilState
+from agents.state import IdeaAnvilState
 
 WRITER_SYSTEM = """You are a technical writer creating a Product Requirements Document (PRD).
 
@@ -1103,7 +1103,7 @@ Section templates:
 """
 
 
-def writer_node(state: Idea AnvilState) -> dict:
+def writer_node(state: IdeaAnvilState) -> dict:
     """Generate PRD based on research insights and refined idea."""
     model = get_model()
     refined = state["refined_idea"]
@@ -1150,10 +1150,10 @@ Depth: {config.depth}
 
 from __future__ import annotations
 
-from agents.state import Idea AnvilState
+from agents.state import IdeaAnvilState
 
 
-def reviewer_node(state: Idea AnvilState) -> dict:
+def reviewer_node(state: IdeaAnvilState) -> dict:
     """Present PRD for review. This node is interrupted for user input.
 
     After resume, user_feedback determines routing:
@@ -1274,7 +1274,7 @@ from __future__ import annotations
 from langgraph.graph import StateGraph, START, END
 from langgraph.types import Send
 
-from agents.state import Idea AnvilState, PRDConfig
+from agents.state import IdeaAnvilState, PRDConfig
 from agents.memory.checkpointer import get_checkpointer
 from agents.nodes.clarifier import clarifier_node
 from agents.nodes.planner import planner_node
@@ -1284,14 +1284,14 @@ from agents.nodes.writer import writer_node
 from agents.nodes.reviewer import reviewer_node
 
 
-def route_after_clarifier(state: Idea AnvilState) -> str:
+def route_after_clarifier(state: IdeaAnvilState) -> str:
     """Route based on whether idea is refined."""
     if state.get("refined_idea") is not None:
         return "planner"
     return "__interrupt__"  # Wait for user answer, then re-enter clarifier
 
 
-def fan_out_searches(state: Idea AnvilState) -> list[Send]:
+def fan_out_searches(state: IdeaAnvilState) -> list[Send]:
     """Fan out to parallel searcher nodes via Send()."""
     return [
         Send("searcher", {"query": q.model_dump(), "research_results": []})
@@ -1299,7 +1299,7 @@ def fan_out_searches(state: Idea AnvilState) -> list[Send]:
     ]
 
 
-def route_after_reviewer(state: Idea AnvilState) -> str:
+def route_after_reviewer(state: IdeaAnvilState) -> str:
     """Route based on user feedback."""
     phase = state.get("phase", "reviewing")
     if phase == "done":
@@ -1313,7 +1313,7 @@ def route_after_reviewer(state: Idea AnvilState) -> str:
 
 def build_graph():
     """Build and compile the Idea Anvil graph."""
-    graph = StateGraph(Idea AnvilState)
+    graph = StateGraph(IdeaAnvilState)
 
     # Add nodes
     graph.add_node("clarifier", clarifier_node)
