@@ -14,6 +14,7 @@ interface InputBarProps {
 
 export function InputBar({ onSend, disabled = false, placeholder = 'Type your response\u2026' }: InputBarProps) {
   const [value, setValue] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSend = useCallback(() => {
@@ -44,6 +45,8 @@ export function InputBar({ onSend, disabled = false, placeholder = 'Type your re
     }
   }, [])
 
+  const hasValue = value.trim().length > 0
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -51,24 +54,36 @@ export function InputBar({ onSend, disabled = false, placeholder = 'Type your re
       transition={{ duration: ANIMATION.duration.normal, ease: ANIMATION.ease }}
       className="relative"
     >
-      <div className="flex items-end gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 transition-colors duration-200 focus-within:border-zinc-700">
+      <div
+        className={`flex items-end gap-2 rounded-2xl border bg-zinc-900/60 backdrop-blur-sm px-5 py-3.5 transition-glow ${
+          isFocused
+            ? 'border-zinc-600/50 ring-glow'
+            : 'border-white/[0.06]'
+        }`}
+      >
         <textarea
           ref={textareaRef}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none bg-transparent text-sm text-zinc-200 placeholder:text-zinc-600 outline-none disabled:opacity-40"
+          className="flex-1 resize-none bg-transparent text-sm text-zinc-200 placeholder:text-zinc-600 placeholder:transition-opacity placeholder:duration-300 focus:placeholder:opacity-40 outline-none disabled:opacity-40 leading-relaxed"
         />
         <Button
           size="icon-sm"
           variant="ghost"
           onClick={handleSend}
-          disabled={disabled || !value.trim()}
-          className="shrink-0 text-zinc-500 hover:text-zinc-200 disabled:opacity-30"
+          disabled={disabled || !hasValue}
+          className={`shrink-0 rounded-xl transition-all duration-300 ${
+            hasValue && !disabled
+              ? 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700 hover:scale-105'
+              : 'text-zinc-600 disabled:opacity-20'
+          }`}
         >
           <ArrowUp className="size-4" />
         </Button>

@@ -27,40 +27,40 @@ export function PhaseIndicator() {
   const currentIndex = getPhaseIndex(phase)
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1.5">
       {phases.map((p) => {
         const pIndex = getPhaseIndex(p.key)
         const isActive = p.key === phase || (phase === 'planning' && p.key === 'clarifying') || (phase === 'synthesizing' && p.key === 'researching')
         const isPast = pIndex < currentIndex && !isActive
 
         return (
-          <div key={p.key} className="flex items-center gap-1">
+          <div key={p.key} className="flex items-center gap-1.5">
             <motion.div
               layout
               transition={{ duration: ANIMATION.duration.slow, ease: ANIMATION.ease }}
               className="relative flex items-center"
             >
               <span
-                className={`text-xs tracking-wide transition-colors duration-300 ${
+                className={`text-xs tracking-wide transition-all duration-300 ${
                   isActive
-                    ? 'text-zinc-50'
+                    ? 'text-zinc-50 font-medium'
                     : isPast
                       ? 'text-zinc-500'
-                      : 'text-zinc-600'
+                      : 'text-zinc-700'
                 }`}
               >
-                {p.label}
+                {isPast ? `\u2713 ${p.label}` : p.label}
               </span>
               {isActive && (
                 <motion.div
                   layoutId="phase-active"
-                  className="absolute -bottom-1 left-0 right-0 h-px bg-zinc-400"
+                  className="absolute -bottom-1.5 left-0 right-0 h-px bg-zinc-400 shadow-[0_1px_8px_-2px_rgba(161,161,170,0.3)]"
                   transition={{ duration: ANIMATION.duration.slow, ease: ANIMATION.ease }}
                 />
               )}
             </motion.div>
             {p.key !== 'done' && (
-              <span className="text-zinc-700 text-xs mx-1">/</span>
+              <span className="text-zinc-800 text-[10px] mx-0.5">{'\u00B7'}</span>
             )}
           </div>
         )

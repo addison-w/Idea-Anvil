@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Sparkles, FileText, Search } from 'lucide-react'
 import { useSessionStore } from '@/stores/session-store'
 import { useSession } from '@/hooks/use-session'
 import { Header } from '@/components/layout/header'
@@ -12,8 +12,15 @@ import { HistoryDrawer } from '@/components/layout/history-drawer'
 import { Button } from '@/components/ui/button'
 import { ANIMATION } from '@/lib/constants'
 
+const featurePills = [
+  { icon: Search, label: 'Multi-source research' },
+  { icon: FileText, label: 'Implementation-ready PRDs' },
+  { icon: Sparkles, label: 'AI-powered validation' },
+]
+
 function IdleScreen({ onStart }: { onStart: (idea: string) => void }) {
   const [value, setValue] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim()
@@ -22,46 +29,83 @@ function IdleScreen({ onStart }: { onStart: (idea: string) => void }) {
   }, [value, onStart])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 bg-grid">
+      <div className="pointer-events-none absolute inset-0 bg-glow" />
+
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: ANIMATION.ease }}
-        className="w-full max-w-lg space-y-8 text-center"
+        transition={{ duration: 0.8, ease: ANIMATION.ease }}
+        className="relative z-10 w-full max-w-xl space-y-12 text-center"
       >
-        <div className="space-y-3">
-          <h1 className="font-sans text-2xl font-light tracking-[0.08em] text-zinc-200">
+        <div className="space-y-4">
+          <h1 className="text-shimmer font-sans text-4xl font-extralight tracking-[0.12em] uppercase">
             Idea Anvil
           </h1>
-          <p className="text-sm text-zinc-600 leading-relaxed">
-            Turn rough ideas into validated, implementation-ready PRDs
+          <p className="mx-auto max-w-sm text-sm leading-relaxed text-zinc-500">
+            Turn rough ideas into validated, implementation-ready product requirement documents
           </p>
         </div>
 
-        <div className="relative">
-          <textarea
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault()
-                handleSubmit()
-              }
-            }}
-            placeholder="Describe your idea..."
-            rows={3}
-            className="w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 pr-12 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none transition-colors duration-200 focus:border-zinc-700"
-          />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: ANIMATION.ease }}
+          className="relative"
+        >
+          <div
+            className={`rounded-2xl border bg-zinc-900/60 backdrop-blur-sm px-5 py-4 pr-14 transition-glow ${
+              isFocused
+                ? 'border-zinc-600/50 ring-glow'
+                : 'border-white/[0.06]'
+            }`}
+          >
+            <textarea
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleSubmit()
+                }
+              }}
+              placeholder="Describe your idea..."
+              rows={3}
+              className="w-full resize-none bg-transparent text-sm text-zinc-200 placeholder:text-zinc-600 placeholder:transition-opacity placeholder:duration-300 focus:placeholder:opacity-50 outline-none leading-relaxed"
+            />
+          </div>
           <Button
             size="icon-sm"
             variant="ghost"
             onClick={handleSubmit}
             disabled={!value.trim()}
-            className="absolute bottom-3 right-3 text-zinc-600 hover:text-zinc-200 disabled:opacity-30"
+            className="absolute bottom-4 right-4 rounded-xl text-zinc-500 transition-all duration-300 hover:bg-zinc-800 hover:text-zinc-200 hover:scale-105 disabled:opacity-20 disabled:hover:scale-100"
           >
             <ArrowUp className="size-4" />
           </Button>
-        </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: ANIMATION.ease }}
+          className="flex items-center justify-center gap-3"
+        >
+          {featurePills.map((pill, i) => (
+            <motion.div
+              key={pill.label}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 + i * 0.1, ease: ANIMATION.ease }}
+              className="flex items-center gap-1.5 rounded-full border border-white/[0.04] bg-zinc-900/40 px-3 py-1.5"
+            >
+              <pill.icon className="size-3 text-zinc-600" />
+              <span className="text-[11px] text-zinc-500">{pill.label}</span>
+            </motion.div>
+          ))}
+        </motion.div>
       </motion.div>
     </div>
   )

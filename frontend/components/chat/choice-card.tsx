@@ -14,7 +14,7 @@ export function ChoiceCard({ choices, onSelect }: ChoiceCardProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: ANIMATION.duration.normal, ease: ANIMATION.ease }}
-      className="flex flex-wrap gap-2 px-1 py-1"
+      className="flex flex-wrap gap-2.5 px-1 py-2"
     >
       {choices.map((choice, i) => (
         <motion.button
@@ -28,7 +28,7 @@ export function ChoiceCard({ choices, onSelect }: ChoiceCardProps) {
             damping: ANIMATION.spring.damping,
           }}
           onClick={() => onSelect(choice)}
-          className="rounded-lg border border-zinc-700/50 bg-zinc-900/50 px-4 py-2.5 text-sm text-zinc-300 transition-colors duration-200 hover:border-zinc-600 hover:bg-zinc-800/80 hover:text-zinc-100"
+          className="rounded-xl border border-white/[0.06] bg-zinc-900/40 px-4 py-3 text-sm text-zinc-400 transition-all duration-300 hover:border-zinc-600/50 hover:bg-zinc-800/40 hover:text-zinc-200 hover:shadow-[0_0_20px_-5px_rgba(161,161,170,0.1)] active:scale-[0.98]"
         >
           {choice}
         </motion.button>
