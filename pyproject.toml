@@ -1,0 +1,38 @@
+[project]
+name = "idea-anvil"
+version = "0.1.0"
+description = "AI-powered idea-to-PRD platform"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph>=0.4",
+    "langchain>=0.3",
+    "langchain-community>=0.3",
+    "langchain-openai>=0.3",
+    "zhipuai>=2.1",
+    "tavily-python>=0.5",
+    "praw>=7.8",
+    "httpx>=0.28",
+    "pydantic>=2.10",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "ruff>=0.9",
+]
+backend = [
+    "fastapi>=0.115",
+    "uvicorn>=0.34",
+    "websockets>=14.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
