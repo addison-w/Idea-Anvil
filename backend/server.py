@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api import chat, history, export
+from backend.ws import stream as ws_stream
 
 
 def create_app() -> FastAPI:
@@ -23,6 +24,7 @@ def create_app() -> FastAPI:
     app.include_router(chat.router, prefix="/api")
     app.include_router(history.router, prefix="/api")
     app.include_router(export.router, prefix="/api")
+    app.include_router(ws_stream.router, prefix="/ws")
 
     @app.get("/health")
     def health():
