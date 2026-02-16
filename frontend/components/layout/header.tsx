@@ -11,7 +11,7 @@ interface HeaderProps {
 
 export function Header({ onHistoryOpen, onNewSession }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-12 items-center justify-between border-b border-white/[0.04] bg-zinc-950/70 px-3 backdrop-blur-xl sm:h-14 sm:px-6">
+    <header className="relative sticky top-0 z-30 flex h-12 items-center justify-between border-b border-white/[0.04] bg-zinc-950/70 px-3 backdrop-blur-xl sm:h-16 sm:px-6">
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
         <button
           onClick={onNewSession}
@@ -33,9 +33,13 @@ export function Header({ onHistoryOpen, onNewSession }: HeaderProps) {
         </Button>
       </div>
 
-      <div className="min-w-0 flex-1 px-2 sm:px-4">
-        <PhaseIndicator />
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="pointer-events-auto">
+          <PhaseIndicator />
+        </div>
       </div>
+
+      <div className="min-w-0 flex-1" />
 
       <div className="flex shrink-0 items-center gap-2">
         <Button

@@ -81,9 +81,8 @@ def clarifier_node(state: IdeaAnvilState) -> dict:
         return {
             "messages": [response],
             "refined_idea": refined,
-            "phase": "planning",
             "clarification_round": round_num + 1,
-            "pending_interrupt": None,
+            "pending_interrupt": "clarification_complete",
         }
 
     messages = [SystemMessage(content=CLARIFIER_SYSTEM)] + state["messages"]
@@ -98,9 +97,8 @@ def clarifier_node(state: IdeaAnvilState) -> dict:
             return {
                 "messages": [response],
                 "refined_idea": refined,
-                "phase": "planning",
                 "clarification_round": round_num + 1,
-                "pending_interrupt": None,
+                "pending_interrupt": "clarification_complete",
             }
         except (json.JSONDecodeError, ValueError):
             pass

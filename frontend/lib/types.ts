@@ -1,6 +1,15 @@
 export type Phase = 'idle' | 'clarifying' | 'planning' | 'researching' | 'synthesizing' | 'writing' | 'reviewing' | 'done'
 
-export type InterruptType = 'clarification' | 'prd_review'
+export type InterruptType = 'clarification' | 'clarification_complete' | 'prd_review'
+
+export interface RefinedIdea {
+  title: string
+  problem: string
+  target_users: string[]
+  core_features: string[]
+  business_model?: string | null
+  constraints?: string[]
+}
 
 export interface Message {
   id: string

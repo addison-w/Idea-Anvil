@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Phase, Message, SourceStatus, InterruptType, ActivityEvent, SearchQueryInfo } from '@/lib/types'
+import type { Phase, Message, SourceStatus, InterruptType, ActivityEvent, SearchQueryInfo, RefinedIdea } from '@/lib/types'
 
 interface SessionState {
   threadId: string | null
@@ -12,6 +12,7 @@ interface SessionState {
   pendingInterrupt: InterruptType | null
   activityLog: ActivityEvent[]
   searchQueries: SearchQueryInfo[]
+  refinedIdea: RefinedIdea | null
 
   setThreadId: (id: string | null) => void
   setPhase: (phase: Phase) => void
@@ -24,6 +25,7 @@ interface SessionState {
   addActivity: (event: ActivityEvent) => void
   completeActivity: (id: string) => void
   setSearchQueries: (queries: SearchQueryInfo[]) => void
+  setRefinedIdea: (idea: RefinedIdea | null) => void
   reset: () => void
 }
 
@@ -45,6 +47,7 @@ const initialState = {
   pendingInterrupt: null,
   activityLog: [],
   searchQueries: [],
+  refinedIdea: null,
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -101,5 +104,7 @@ export const useSessionStore = create<SessionState>((set) => ({
 
   setSearchQueries: (queries) => set({ searchQueries: queries }),
 
-  reset: () => set({ ...initialState, sources: { ...initialSources }, activityLog: [], searchQueries: [] }),
+  setRefinedIdea: (idea) => set({ refinedIdea: idea }),
+
+  reset: () => set({ ...initialState, sources: { ...initialSources }, activityLog: [], searchQueries: [], refinedIdea: null }),
 }))

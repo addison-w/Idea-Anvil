@@ -19,6 +19,22 @@ class RefinedIdea(BaseModel):
     business_model: str | None = None
     constraints: list[str] = Field(default_factory=list)
 
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        if isinstance(obj, dict):
+            for field in ("target_users", "core_features", "constraints"):
+                val = obj.get(field)
+                if isinstance(val, str):
+                    obj[field] = [val]
+        return super().model_validate(obj, **kwargs)
+
+    def __init__(self, **data):
+        for field in ("target_users", "core_features", "constraints"):
+            val = data.get(field)
+            if isinstance(val, str):
+                data[field] = [val]
+        super().__init__(**data)
+
 
 class SearchQuery(BaseModel):
     source: Literal["hacker_news", "reddit", "tavily", "product_hunt"]

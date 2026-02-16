@@ -114,7 +114,7 @@ function IdleScreen({ onStart }: { onStart: (idea: string) => void }) {
 
 export default function Home() {
   const phase = useSessionStore((s) => s.phase)
-  const { startSession, sendResume } = useSession()
+  const { startSession, sendResume, approveResearch, continueRefining } = useSession()
   const [historyOpen, setHistoryOpen] = useState(false)
 
   const handleNewSession = useCallback(() => {
@@ -152,7 +152,7 @@ export default function Home() {
             <Header onHistoryOpen={() => setHistoryOpen(true)} onNewSession={handleNewSession} />
             <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
               <main className="min-h-0 flex-1 overflow-hidden">
-                <ChatArea onSend={handleSend} />
+                <ChatArea onSend={handleSend} onApproveResearch={approveResearch} onContinueRefining={continueRefining} />
               </main>
               <ResearchPanel />
             </div>

@@ -9,10 +9,13 @@ import { MessageBubble } from './message-bubble'
 import { ChoiceCard } from './choice-card'
 import { ActivityLog } from './activity-log'
 import { InputBar } from './input-bar'
+import { ApprovalGate } from './approval-gate'
 import { PrdPreview } from '@/components/prd/prd-preview'
 
 interface ChatAreaProps {
   onSend: (message: string) => void
+  onApproveResearch: () => void
+  onContinueRefining: (message: string) => void
 }
 
 function TypingIndicator() {
@@ -43,11 +46,13 @@ function TypingIndicator() {
   )
 }
 
-export function ChatArea({ onSend }: ChatAreaProps) {
+export function ChatArea({ onSend, onApproveResearch, onContinueRefining }: ChatAreaProps) {
   const messages = useSessionStore((s) => s.messages)
   const isStreaming = useSessionStore((s) => s.isStreaming)
   const prdDraft = useSessionStore((s) => s.prdDraft)
   const phase = useSessionStore((s) => s.phase)
+  const pendingInterrupt = useSessionStore((s) => s.pendingInterrupt)
+  const refinedIdea = useSessionStore((s) => s.refinedIdea)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -86,18 +91,27 @@ export function ChatArea({ onSend }: ChatAreaProps) {
           )}
 
           <AnimatePresence mode="popLayout">
-            {messages.map((msg, index) => (
-              <MessageBubble
-                key={msg.id}
-                message={msg}
-                isStreamingMessage={isStreaming && index === lastMessageIndex && msg.role === 'assistant'}
-                onOptionSelect={
-                  msg.role === 'assistant' && index === lastMessageIndex && !isStreaming
-                    ? onSend
-                    : undefined
-                }
-              />
-            ))}
+            {messages.map((msg, index) => {
+              const isJsonSummary =
+                msg.role === 'assistant' &&
+                msg.content.includes('"title"') &&
+                msg.content.includes('"core_features"') &&
+                msg.content.includes('"target_users"')
+              if (isJsonSummary) return null
+
+              return (
+                <MessageBubble
+                  key={msg.id}
+                  message={msg}
+                  isStreamingMessage={isStreaming && index === lastMessageIndex && msg.role === 'assistant'}
+                  onOptionSelect={
+                    msg.role === 'assistant' && index === lastMessageIndex && !isStreaming
+                      ? onSend
+                      : undefined
+                  }
+                />
+              )
+            })}
           </AnimatePresence>
 
           {showChoices && lastMessage.choices && (
@@ -107,6 +121,14 @@ export function ChatArea({ onSend }: ChatAreaProps) {
           <AnimatePresence>
             {showTyping && <TypingIndicator />}
           </AnimatePresence>
+
+          {pendingInterrupt === 'clarification_complete' && refinedIdea && (
+            <ApprovalGate
+              refinedIdea={refinedIdea}
+              onApprove={onApproveResearch}
+              onContinue={onContinueRefining}
+            />
+          )}
 
           <ActivityLog />
 
@@ -121,19 +143,21 @@ export function ChatArea({ onSend }: ChatAreaProps) {
         </div>
       </ScrollArea>
 
-      <div className="mx-auto w-full max-w-2xl px-3 pb-3 pt-2 sm:px-4 sm:pb-4">
-        <InputBar
-          onSend={onSend}
-          disabled={isStreaming}
-          placeholder={
-            phase === 'reviewing'
-              ? 'Type feedback or "approve"'
-              : phase === 'idle'
-                ? 'Describe your idea\u2026'
-                : 'Type your response\u2026'
-          }
-        />
-      </div>
+      {pendingInterrupt !== 'clarification_complete' && (
+        <div className="mx-auto w-full max-w-2xl px-3 pb-3 pt-2 sm:px-4 sm:pb-4">
+          <InputBar
+            onSend={onSend}
+            disabled={isStreaming}
+            placeholder={
+              phase === 'reviewing'
+                ? 'Type feedback or "approve"'
+                : phase === 'idle'
+                  ? 'Describe your idea\u2026'
+                  : 'Type your response\u2026'
+            }
+          />
+        </div>
+      )}
     </div>
   )
 }

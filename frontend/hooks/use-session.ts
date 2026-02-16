@@ -3,7 +3,7 @@
 import { useCallback, useRef } from 'react'
 import { useSessionStore } from '@/stores/session-store'
 import { API_URL, WS_URL } from '@/lib/constants'
-import type { WSEvent, Phase, SearchQueryInfo } from '@/lib/types'
+import type { WSEvent, Phase, SearchQueryInfo, RefinedIdea } from '@/lib/types'
 
 const sourceLabels: Record<string, string> = {
   hacker_news: 'Hacker News',
@@ -168,6 +168,9 @@ export function useSession() {
         if (prdDraft) {
           store.setPrdDraft(prdDraft)
         }
+        if (event.interrupt_type === 'clarification_complete' && event.data?.refined_idea) {
+          store.setRefinedIdea(event.data.refined_idea as RefinedIdea)
+        }
         store.setStreaming(false)
         break
       }
@@ -283,5 +286,36 @@ export function useSession() {
     ws.send(JSON.stringify({ type: 'resume', value }))
   }, [store])
 
-  return { startSession, sendResume }
+  const approveResearch = useCallback(() => {
+    const ws = wsRef.current
+    if (!ws || ws.readyState !== WebSocket.OPEN) return
+
+    store.addMessage({
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: 'Approved — starting research',
+      timestamp: Date.now(),
+    })
+    store.setPendingInterrupt(null)
+    store.setStreaming(true)
+    ws.send(JSON.stringify({ type: 'resume', value: 'approve', action: 'approve' }))
+  }, [store])
+
+  const continueRefining = useCallback((message: string) => {
+    const ws = wsRef.current
+    if (!ws || ws.readyState !== WebSocket.OPEN) return
+
+    store.addMessage({
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: message,
+      timestamp: Date.now(),
+    })
+    store.setPendingInterrupt(null)
+    store.setRefinedIdea(null)
+    store.setStreaming(true)
+    ws.send(JSON.stringify({ type: 'resume', value: message, action: 'continue' }))
+  }, [store])
+
+  return { startSession, sendResume, approveResearch, continueRefining }
 }

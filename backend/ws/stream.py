@@ -168,16 +168,24 @@ async def websocket_stream(websocket: WebSocket, thread_id: str):
                     await stream_until_interrupt(None, config)
                     continue
 
+            interrupt_data: dict = {
+                "phase": current_values.get("phase"),
+                "prd_draft": current_values.get("prd_draft"),
+                "prd_version": current_values.get("prd_version", 0),
+            }
+
+            refined = current_values.get("refined_idea")
+            if refined and interrupt_type == "clarification_complete":
+                interrupt_data["refined_idea"] = (
+                    refined.model_dump() if hasattr(refined, "model_dump") else refined
+                )
+
             logger.info("sending interrupt event: type=%s", interrupt_type)
             await websocket.send_json(
                 {
                     "type": "interrupt",
                     "interrupt_type": interrupt_type,
-                    "data": {
-                        "phase": current_values.get("phase"),
-                        "prd_draft": current_values.get("prd_draft"),
-                        "prd_version": current_values.get("prd_version", 0),
-                    },
+                    "data": interrupt_data,
                 }
             )
 
@@ -201,6 +209,25 @@ async def websocket_stream(websocket: WebSocket, thread_id: str):
                     {"messages": [HumanMessage(content=resume_value)]},
                     as_node="clarifier",
                 )
+            elif interrupt_type == "clarification_complete":
+                resume_action = resume_data.get("action", "approve")
+                if resume_action == "continue":
+                    logger.info("user wants to continue refining, resetting clarification")
+                    update: dict = {
+                        "refined_idea": None,
+                        "pending_interrupt": None,
+                        "clarification_round": 0,
+                    }
+                    if resume_value:
+                        update["messages"] = [HumanMessage(content=resume_value)]
+                    graph.update_state(config, update, as_node="clarifier")
+                else:
+                    logger.info("user approved, proceeding to research")
+                    graph.update_state(
+                        config,
+                        {"pending_interrupt": None, "phase": "planning"},
+                        as_node="clarifier",
+                    )
             elif interrupt_type == "prd_review":
                 logger.info("updating state with user_feedback for prd_review")
                 graph.update_state(
