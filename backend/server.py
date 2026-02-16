@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api import chat, history, export
 from backend.ws import stream as ws_stream
+
+load_dotenv()
 
 
 def create_app() -> FastAPI:

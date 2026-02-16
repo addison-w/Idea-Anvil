@@ -3,7 +3,7 @@
 from __future__ import annotations
 import json
 from langchain_core.messages import SystemMessage
-from agents.config import get_model
+from agents.config import get_model, strip_think
 from agents.state import IdeaAnvilState, ResearchInsights
 
 SYNTHESIZER_SYSTEM = """You are a market research analyst. Analyze search results from multiple sources and extract insights.
@@ -47,7 +47,7 @@ Analyze these results and extract insights."""
         ]
     )
 
-    content = response.content
+    content = strip_think(response.content)
     insights = None
     if "```json" in content:
         json_str = content.split("```json")[1].split("```")[0].strip()

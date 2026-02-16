@@ -119,10 +119,8 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
     @apply bg-background text-foreground;
   }
 }
@@ -199,4 +197,74 @@
 .prose-refined :where(h1, h2, h3, h4):not(:where([class~="not-prose"] *)) {
   letter-spacing: -0.01em;
   font-weight: 400;
+}
+
+/* ─── Dynamic Animations ─── */
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px 0px rgba(161,161,170,0.2); }
+  50% { box-shadow: 0 0 12px 2px rgba(161,161,170,0.3); }
+}
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.streaming-cursor::after {
+  content: '▎';
+  animation: blink 1s step-end infinite;
+  color: rgba(161,161,170,0.6);
+  font-weight: 100;
+}
+
+@keyframes count-flash {
+  0% { color: rgba(52,211,153,0.8); }
+  100% { color: inherit; }
+}
+
+@keyframes phase-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px 0px rgba(161,161,170,0.15); }
+  50% { opacity: 0.85; box-shadow: 0 0 10px 2px rgba(161,161,170,0.25); }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.8); }
+}
+.animate-dot-pulse { animation: dot-pulse 2s ease-in-out infinite; }
+
+@keyframes success-flash {
+  0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.3); }
+  50% { box-shadow: 0 0 12px 2px rgba(52,211,153,0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+}
+.animate-success-flash { animation: success-flash 0.6s ease-out; }
+
+.hover-shadow-glow {
+  transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(161,161,170,0.15);
+}
+
+.prd-table tbody tr:nth-child(even) {
+  background-color: rgba(24 24 27 / 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .streaming-cursor::after {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .animate-pulse-glow,
+  .animate-dot-pulse,
+  .animate-success-flash {
+    animation: none !important;
+  }
 }

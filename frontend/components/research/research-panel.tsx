@@ -32,8 +32,8 @@ export function ResearchPanel() {
             </h2>
 
             <div className="space-y-2">
-              {Object.values(sources).map((source) => (
-                <SourceCard key={source.source} source={source} />
+              {Object.values(sources).map((source, i) => (
+                <SourceCard key={source.source} source={source} index={i} />
               ))}
             </div>
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 import json
 from langchain_core.messages import SystemMessage
-from agents.config import get_model
+from agents.config import get_model, strip_think
 from agents.state import IdeaAnvilState, SearchQuery
 
 PLANNER_SYSTEM = """You are a research strategist. Given a refined product idea, generate search queries for market research.
@@ -48,7 +48,7 @@ Generate search queries to validate this idea."""
         ]
     )
 
-    content = response.content
+    content = strip_think(response.content)
     queries = []
     if "```json" in content:
         json_str = content.split("```json")[1].split("```")[0].strip()

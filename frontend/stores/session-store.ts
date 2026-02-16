@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Phase, Message, SourceStatus, InterruptType } from '@/lib/types'
+import type { Phase, Message, SourceStatus, InterruptType, ActivityEvent, SearchQueryInfo } from '@/lib/types'
 
 interface SessionState {
   threadId: string | null
@@ -10,6 +10,8 @@ interface SessionState {
   prdDraft: string | null
   prdVersion: number
   pendingInterrupt: InterruptType | null
+  activityLog: ActivityEvent[]
+  searchQueries: SearchQueryInfo[]
 
   setThreadId: (id: string | null) => void
   setPhase: (phase: Phase) => void
@@ -19,6 +21,9 @@ interface SessionState {
   updateSource: (source: string, update: Partial<SourceStatus>) => void
   setPrdDraft: (prd: string | null) => void
   setPendingInterrupt: (interrupt: InterruptType | null) => void
+  addActivity: (event: ActivityEvent) => void
+  completeActivity: (id: string) => void
+  setSearchQueries: (queries: SearchQueryInfo[]) => void
   reset: () => void
 }
 
@@ -38,6 +43,8 @@ const initialState = {
   prdDraft: null,
   prdVersion: 0,
   pendingInterrupt: null,
+  activityLog: [],
+  searchQueries: [],
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -78,5 +85,21 @@ export const useSessionStore = create<SessionState>((set) => ({
 
   setPendingInterrupt: (interrupt) => set({ pendingInterrupt: interrupt }),
 
-  reset: () => set({ ...initialState, sources: { ...initialSources } }),
+  addActivity: (event) =>
+    set((state) => {
+      // Idempotent: skip if an activity with this ID already exists
+      if (state.activityLog.some((e) => e.id === event.id)) return state
+      return { activityLog: [...state.activityLog, event] }
+    }),
+
+  completeActivity: (id) =>
+    set((state) => ({
+      activityLog: state.activityLog.map((e) =>
+        e.id === id ? { ...e, status: 'done' as const } : e
+      ),
+    })),
+
+  setSearchQueries: (queries) => set({ searchQueries: queries }),
+
+  reset: () => set({ ...initialState, sources: { ...initialSources }, activityLog: [], searchQueries: [] }),
 }))

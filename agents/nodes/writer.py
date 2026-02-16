@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from langchain_core.messages import SystemMessage
-from agents.config import get_model
+from agents.config import get_model, strip_think
 from agents.state import IdeaAnvilState
 
 WRITER_SYSTEM = """You are a technical writer creating a Product Requirements Document (PRD).
@@ -64,7 +64,7 @@ Depth: {config.depth}
 
     return {
         "messages": [response],
-        "prd_draft": response.content,
+        "prd_draft": strip_think(response.content),
         "prd_version": state.get("prd_version", 0) + 1,
         "phase": "reviewing",
     }

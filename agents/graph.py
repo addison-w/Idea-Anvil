@@ -37,9 +37,9 @@ def route_after_reviewer(state: IdeaAnvilState) -> str:
     if phase == "done":
         return END
     elif phase == "planning":
-        return "planner"  # Pivot → re-research
+        return "planner"
     elif phase == "writing":
-        return "writer"  # Edit → re-write
+        return "writer"
     return END
 
 
@@ -68,7 +68,8 @@ def build_graph():
     checkpointer = get_checkpointer()
     compiled = graph.compile(
         checkpointer=checkpointer,
-        interrupt_before=["clarifier", "reviewer"],  # Pause for user input
+        interrupt_after=["clarifier"],
+        interrupt_before=["reviewer"],
     )
 
     return compiled

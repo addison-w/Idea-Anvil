@@ -3,7 +3,7 @@ from agents.config import IdeaAnvilConfig
 
 def test_config_defaults():
     config = IdeaAnvilConfig()
-    assert config.model_provider == "zhipuai"
+    assert config.model_provider == "openai"
     assert config.model_name == "glm-5"
     assert config.temperature == 0.7
 

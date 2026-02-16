@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import APIRouter
 
@@ -10,7 +11,6 @@ from backend.models import CreateSessionRequest, CreateSessionResponse, SessionS
 
 router = APIRouter()
 
-# In-memory session store (replace with DB later)
 _sessions: dict[str, dict] = {}
 
 
@@ -25,6 +25,7 @@ def create_session(req: CreateSessionRequest):
         "phase": "clarifying",
         "prd_draft": None,
         "prd_version": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
     return CreateSessionResponse(thread_id=thread_id)
 

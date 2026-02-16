@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Inbox } from 'lucide-react'
+import { X, Inbox, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -18,9 +18,10 @@ interface HistorySession {
 interface HistoryDrawerProps {
   open: boolean
   onClose: () => void
+  onNewSession: () => void
 }
 
-export function HistoryDrawer({ open, onClose }: HistoryDrawerProps) {
+export function HistoryDrawer({ open, onClose, onNewSession }: HistoryDrawerProps) {
   const [sessions, setSessions] = useState<HistorySession[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -30,7 +31,7 @@ export function HistoryDrawer({ open, onClose }: HistoryDrawerProps) {
       const res = await fetch(`${API_URL}/api/history`)
       if (res.ok) {
         const data = await res.json()
-        setSessions(data.sessions || [])
+        setSessions(Array.isArray(data) ? data : data.sessions || [])
       }
     } catch {
       // silently fail
@@ -72,6 +73,7 @@ export function HistoryDrawer({ open, onClose }: HistoryDrawerProps) {
                   variant="ghost"
                   size="icon-xs"
                   onClick={onClose}
+                  aria-label="Close history"
                   className="text-zinc-600 transition-colors duration-300 hover:text-zinc-300"
                 >
                   <X className="size-3.5" />
@@ -79,6 +81,16 @@ export function HistoryDrawer({ open, onClose }: HistoryDrawerProps) {
               </div>
 
               <div className="mx-5 h-px bg-white/[0.04]" />
+
+              <div className="px-5 pt-5">
+                <button
+                  onClick={() => { onNewSession(); onClose() }}
+                  className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dashed border-white/[0.08] bg-zinc-900/20 px-3.5 py-3 text-sm text-zinc-400 transition-all duration-300 hover:border-zinc-600/50 hover:bg-zinc-900/40 hover:text-zinc-200"
+                >
+                  <Plus className="size-4" />
+                  New Idea
+                </button>
+              </div>
 
               <ScrollArea className="flex-1">
                 <div className="space-y-2 p-5">
@@ -103,29 +115,45 @@ export function HistoryDrawer({ open, onClose }: HistoryDrawerProps) {
                     </div>
                   )}
 
-                  {sessions.map((session) => (
-                    <motion.button
-                      key={session.thread_id}
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="w-full rounded-xl border border-white/[0.04] bg-zinc-900/30 p-3.5 text-left transition-all duration-300 hover:border-zinc-700/50 hover:bg-zinc-900/60 hover:shadow-[0_0_15px_-5px_rgba(161,161,170,0.08)]"
-                    >
-                      <p className="mb-2 text-sm leading-relaxed text-zinc-300 line-clamp-2">
-                        {session.idea}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className="border-white/[0.06] text-zinc-500 text-[10px] font-normal"
+                  <AnimatePresence mode="popLayout">
+                    {sessions.map((session) => (
+                      <motion.div
+                        key={session.thread_id}
+                        layout
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                        className="group relative w-full cursor-pointer rounded-xl border border-white/[0.04] bg-zinc-900/30 p-3.5 text-left transition-all duration-300 hover:border-zinc-700/50 hover:bg-zinc-900/60 hover:shadow-[0_0_15px_-5px_rgba(161,161,170,0.08)]"
+                      >
+                        <Button
+                          variant="ghost"
+                          size="icon-xs"
+                          className="absolute right-2.5 top-2.5 text-zinc-700 opacity-0 transition-all duration-200 hover:text-red-400/80 group-hover:opacity-100"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSessions((prev) => prev.filter((s) => s.thread_id !== session.thread_id))
+                            fetch(`${API_URL}/api/history/${session.thread_id}`, { method: 'DELETE' })
+                          }}
                         >
-                          {session.phase}
-                        </Badge>
-                        <span className="text-[10px] text-zinc-700">
-                          {new Date(session.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </motion.button>
-                  ))}
+                          <Trash2 className="size-3" />
+                        </Button>
+                        <p className="mb-2 pr-6 text-sm leading-relaxed text-zinc-300 line-clamp-2">
+                          {session.idea}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="border-white/[0.06] text-zinc-500 text-[10px] font-normal"
+                          >
+                            {session.phase}
+                          </Badge>
+                          <span className="text-[10px] text-zinc-700">
+                            {new Date(session.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </div>
               </ScrollArea>
             </div>

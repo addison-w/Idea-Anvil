@@ -25,7 +25,7 @@ export function PrdEditor({ content, onSave, onCancel }: PrdEditorProps) {
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="min-h-[300px] w-full resize-y rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-sm text-zinc-300 placeholder:text-zinc-700 outline-none focus:border-zinc-700"
+        className="min-h-[300px] w-full resize-y rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-sm text-zinc-300 placeholder:text-zinc-700 outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-600"
       />
       <div className="flex gap-2 justify-end">
         <Button

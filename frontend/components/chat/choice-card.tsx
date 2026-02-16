@@ -28,7 +28,7 @@ export function ChoiceCard({ choices, onSelect }: ChoiceCardProps) {
             damping: ANIMATION.spring.damping,
           }}
           onClick={() => onSelect(choice)}
-          className="rounded-xl border border-white/[0.06] bg-zinc-900/40 px-4 py-3 text-sm text-zinc-400 transition-all duration-300 hover:border-zinc-600/50 hover:bg-zinc-800/40 hover:text-zinc-200 hover:shadow-[0_0_20px_-5px_rgba(161,161,170,0.1)] active:scale-[0.98]"
+          className="cursor-pointer rounded-xl border border-white/[0.06] bg-zinc-900/40 px-4 py-3 text-sm text-zinc-400 transition-all duration-300 hover:border-zinc-600/50 hover:bg-zinc-800/40 hover:text-zinc-200 hover:shadow-[0_0_20px_-5px_rgba(161,161,170,0.1)] active:scale-[0.98]"
         >
           {choice}
         </motion.button>

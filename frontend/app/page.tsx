@@ -81,6 +81,7 @@ function IdleScreen({ onStart }: { onStart: (idea: string) => void }) {
             variant="ghost"
             onClick={handleSubmit}
             disabled={!value.trim()}
+            aria-label="Submit idea"
             className="absolute bottom-4 right-4 rounded-xl text-zinc-500 transition-all duration-300 hover:bg-zinc-800 hover:text-zinc-200 hover:scale-105 disabled:opacity-20 disabled:hover:scale-100"
           >
             <ArrowUp className="size-4" />
@@ -102,7 +103,7 @@ function IdleScreen({ onStart }: { onStart: (idea: string) => void }) {
               className="flex items-center gap-1.5 rounded-full border border-white/[0.04] bg-zinc-900/40 px-3 py-1.5"
             >
               <pill.icon className="size-3 text-zinc-600" />
-              <span className="text-[11px] text-zinc-500">{pill.label}</span>
+              <span className="text-xs text-zinc-500">{pill.label}</span>
             </motion.div>
           ))}
         </motion.div>
@@ -115,6 +116,10 @@ export default function Home() {
   const phase = useSessionStore((s) => s.phase)
   const { startSession, sendResume } = useSession()
   const [historyOpen, setHistoryOpen] = useState(false)
+
+  const handleNewSession = useCallback(() => {
+    useSessionStore.getState().reset()
+  }, [])
 
   const handleStart = useCallback((idea: string) => {
     startSession(idea)
@@ -144,7 +149,7 @@ export default function Home() {
             transition={{ duration: ANIMATION.duration.normal, ease: ANIMATION.ease }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            <Header onHistoryOpen={() => setHistoryOpen(true)} />
+            <Header onHistoryOpen={() => setHistoryOpen(true)} onNewSession={handleNewSession} />
             <div className="flex flex-1 overflow-hidden">
               <main className="flex-1 overflow-hidden">
                 <ChatArea onSend={handleSend} />
@@ -155,7 +160,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <HistoryDrawer open={historyOpen} onClose={() => setHistoryOpen(false)} />
+      <HistoryDrawer open={historyOpen} onClose={() => setHistoryOpen(false)} onNewSession={handleNewSession} />
     </div>
   )
 }
