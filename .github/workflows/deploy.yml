@@ -1,0 +1,63 @@
+name: Build & Push Docker Images
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.backend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/idea-anvil-backend:latest
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.frontend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/idea-anvil-frontend:latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api-ideaanvil.addisons.app
+            NEXT_PUBLIC_WS_URL=wss://api-ideaanvil.addisons.app
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify deploy - backend
+        run: |
+          curl -s -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            -X POST "https://coolify.addisons.app/api/v1/deploy" \
+            -H "Content-Type: application/json" \
+            -d '{"uuid": "${{ vars.COOLIFY_BACKEND_UUID }}"}'
+
+      - name: Trigger Coolify deploy - frontend
+        run: |
+          curl -s -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            -X POST "https://coolify.addisons.app/api/v1/deploy" \
+            -H "Content-Type: application/json" \
+            -d '{"uuid": "${{ vars.COOLIFY_FRONTEND_UUID }}"}'
