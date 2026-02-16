@@ -45,9 +45,34 @@ export function PhaseIndicator() {
   const currentIndex = getPhaseIndex(phase)
   const progress = getProgressPercent(phase)
 
+  const activeLabel = phases.find(
+    (p) => p.key === phase || (phase === 'planning' && p.key === 'clarifying') || (phase === 'synthesizing' && p.key === 'researching'),
+  )?.label
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-1.5">
+    <div className="flex flex-col gap-1 sm:gap-2">
+      {/* Mobile: show only active phase label */}
+      <div className="flex items-center justify-center gap-1.5 sm:hidden">
+        <motion.span
+          className="block size-1.5 rounded-full bg-zinc-400 animate-dot-pulse"
+          key={`mobile-dot-${phase}`}
+        />
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={`mobile-label-${phase}`}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="text-xs font-medium tracking-wide text-zinc-50"
+          >
+            {activeLabel || 'Working'}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+
+      {/* Desktop: full phase labels */}
+      <div className="hidden items-center gap-1.5 sm:flex">
         {phases.map((p) => {
           const pIndex = getPhaseIndex(p.key)
           const isActive = p.key === phase || (phase === 'planning' && p.key === 'clarifying') || (phase === 'synthesizing' && p.key === 'researching')
@@ -106,6 +131,7 @@ export function PhaseIndicator() {
           )
         })}
       </div>
+
       <div className="h-px w-full overflow-hidden rounded-full bg-zinc-800/50">
         <motion.div
           className="h-full bg-gradient-to-r from-zinc-600 to-zinc-400"
@@ -122,7 +148,7 @@ export function PhaseIndicator() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
-            className="text-[10px] text-zinc-600 text-center"
+            className="text-center text-[10px] text-zinc-600"
           >
             {phaseStatusText[phase]}
           </motion.p>

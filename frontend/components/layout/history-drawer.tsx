@@ -62,7 +62,7 @@ export function HistoryDrawer({ open, onClose, onNewSession }: HistoryDrawerProp
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ duration: ANIMATION.duration.normal, ease: ANIMATION.ease }}
-            className="fixed inset-y-0 left-0 z-50 w-80 border-r border-white/[0.04] bg-zinc-950/95 backdrop-blur-xl"
+            className="fixed inset-y-0 left-0 z-50 w-full border-r border-white/[0.04] bg-zinc-950/95 backdrop-blur-xl sm:w-80"
           >
             <div className="flex h-full flex-col">
               <div className="flex items-center justify-between px-5 py-5">

@@ -39,7 +39,7 @@ function IdleScreen({ onStart }: { onStart: (idea: string) => void }) {
         className="relative z-10 w-full max-w-xl space-y-12 text-center"
       >
         <div className="space-y-4">
-          <h1 className="text-shimmer font-sans text-4xl font-extralight tracking-[0.12em] uppercase">
+          <h1 className="text-shimmer font-sans text-3xl font-extralight tracking-[0.12em] uppercase sm:text-4xl">
             Idea Anvil
           </h1>
           <p className="mx-auto max-w-sm text-sm leading-relaxed text-zinc-500">
@@ -92,7 +92,7 @@ function IdleScreen({ onStart }: { onStart: (idea: string) => void }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3, ease: ANIMATION.ease }}
-          className="flex items-center justify-center gap-3"
+          className="flex flex-wrap items-center justify-center gap-2 sm:gap-3"
         >
           {featurePills.map((pill, i) => (
             <motion.div
@@ -130,7 +130,7 @@ export default function Home() {
   }, [sendResume])
 
   return (
-    <div className="flex h-screen flex-col bg-[#09090b]">
+    <div className="flex h-dvh flex-col bg-[#09090b]">
       <AnimatePresence mode="wait">
         {phase === 'idle' ? (
           <motion.div
@@ -150,8 +150,8 @@ export default function Home() {
             className="flex flex-1 flex-col overflow-hidden"
           >
             <Header onHistoryOpen={() => setHistoryOpen(true)} onNewSession={handleNewSession} />
-            <div className="flex flex-1 overflow-hidden">
-              <main className="flex-1 overflow-hidden">
+            <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
+              <main className="min-h-0 flex-1 overflow-hidden">
                 <ChatArea onSend={handleSend} />
               </main>
               <ResearchPanel />

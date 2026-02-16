@@ -71,7 +71,7 @@ export function ChatArea({ onSend }: ChatAreaProps) {
   return (
     <div className="flex h-full flex-col">
       <ScrollArea className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
+        <div className="mx-auto max-w-2xl space-y-3 px-3 py-4 sm:space-y-4 sm:px-4 sm:py-6">
           {phase === 'clarifying' && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -121,7 +121,7 @@ export function ChatArea({ onSend }: ChatAreaProps) {
         </div>
       </ScrollArea>
 
-      <div className="mx-auto w-full max-w-2xl px-4 pb-4 pt-2">
+      <div className="mx-auto w-full max-w-2xl px-3 pb-3 pt-2 sm:px-4 sm:pb-4">
         <InputBar
           onSend={onSend}
           disabled={isStreaming}

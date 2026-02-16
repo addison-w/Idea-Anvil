@@ -94,7 +94,7 @@ export function MessageBubble({ message, isStreamingMessage, onOptionSelect }: M
       className={`group flex ${isUser ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`max-w-[80%] transition-colors duration-300 ${
+        className={`max-w-[92%] transition-colors duration-300 sm:max-w-[80%] ${
           isUser
             ? 'rounded-2xl rounded-br-md border border-white/[0.06] bg-zinc-900/60 px-4 py-3 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)]'
             : 'rounded-2xl px-1 py-2 group-hover:bg-zinc-900/20'

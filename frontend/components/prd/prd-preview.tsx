@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, type ComponentPropsWithoutRef } from 'react'
+import { useState, useCallback, useEffect, type ComponentPropsWithoutRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -153,8 +153,16 @@ const mdComponents: Components = {
 export function PrdPreview({ content, isGenerating }: PrdPreviewProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [exportUrl, setExportUrl] = useState<string | null>(null)
   const setPrdDraft = useSessionStore((s) => s.setPrdDraft)
   const threadId = useSessionStore((s) => s.threadId)
+
+  useEffect(() => {
+    if (exportUrl) {
+      URL.revokeObjectURL(exportUrl)
+      setExportUrl(null)
+    }
+  }, [content]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(content)
@@ -162,37 +170,24 @@ export function PrdPreview({ content, isGenerating }: PrdPreviewProps) {
     setTimeout(() => setCopied(false), 2000)
   }, [content])
 
-  const handleExport = useCallback(async () => {
+  const handlePrepareExport = useCallback(async () => {
+    if (exportUrl) {
+      URL.revokeObjectURL(exportUrl)
+      setExportUrl(null)
+      return
+    }
     if (!threadId) return
     try {
       const res = await fetch(`${API_URL}/api/export/${threadId}`)
-      if (!res.ok) {
-        const blob = new Blob([content], { type: 'text/markdown' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'prd.md'
-        a.click()
-        URL.revokeObjectURL(url)
-        return
-      }
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'prd.md'
-      a.click()
-      URL.revokeObjectURL(url)
+      const blob = res.ok
+        ? await res.blob()
+        : new Blob([content], { type: 'text/markdown' })
+      setExportUrl(URL.createObjectURL(blob))
     } catch {
       const blob = new Blob([content], { type: 'text/markdown' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'prd.md'
-      a.click()
-      URL.revokeObjectURL(url)
+      setExportUrl(URL.createObjectURL(blob))
     }
-  }, [threadId, content])
+  }, [threadId, content, exportUrl])
 
   const handleSave = useCallback((newContent: string) => {
     setPrdDraft(newContent)
@@ -255,18 +250,31 @@ export function PrdPreview({ content, isGenerating }: PrdPreviewProps) {
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    onClick={handleExport}
-                    aria-label="Export PRD"
-                    className="text-zinc-600 transition-colors duration-300 hover:text-zinc-300"
-                  >
-                    <Download className="size-3" />
-                  </Button>
+                  {exportUrl ? (
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      asChild
+                      className="text-emerald-400 transition-colors duration-300 hover:text-emerald-300"
+                    >
+                      <a href={exportUrl} download="prd.md" aria-label="Download PRD">
+                        <Download className="size-3" />
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={handlePrepareExport}
+                      aria-label="Export PRD"
+                      className="text-zinc-600 transition-colors duration-300 hover:text-zinc-300"
+                    >
+                      <Download className="size-3" />
+                    </Button>
+                  )}
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="text-xs">
-                  Export
+                  {exportUrl ? 'Download' : 'Export'}
                 </TooltipContent>
               </Tooltip>
               <Tooltip>

@@ -55,7 +55,7 @@ export function InputBar({ onSend, disabled = false, placeholder = 'Type your re
       className="relative"
     >
       <div
-        className={`flex items-end gap-2 rounded-2xl border bg-zinc-900/60 backdrop-blur-sm px-5 py-3.5 transition-glow ${
+        className={`flex items-end gap-2 rounded-2xl border bg-zinc-900/60 backdrop-blur-sm px-3 py-3 transition-glow sm:px-5 sm:py-3.5 ${
           isFocused
             ? 'border-zinc-600/50 ring-glow'
             : 'border-white/[0.06]'

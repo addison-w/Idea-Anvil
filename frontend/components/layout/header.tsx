@@ -11,14 +11,14 @@ interface HeaderProps {
 
 export function Header({ onHistoryOpen, onNewSession }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.04] bg-zinc-950/70 px-6 backdrop-blur-xl">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-12 items-center justify-between border-b border-white/[0.04] bg-zinc-950/70 px-3 backdrop-blur-xl sm:h-14 sm:px-6">
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
         <button
           onClick={onNewSession}
-          className="flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 transition-colors duration-300 hover:opacity-80"
+          className="flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 transition-colors duration-300 hover:opacity-80 sm:gap-2"
         >
           <Hexagon className="size-4 text-zinc-600" strokeWidth={1.5} />
-          <span className="font-sans text-[13px] font-light tracking-[0.2em] uppercase text-zinc-400 transition-colors duration-300 hover:text-zinc-200">
+          <span className="hidden font-sans text-[13px] font-light tracking-[0.2em] uppercase text-zinc-400 transition-colors duration-300 hover:text-zinc-200 sm:inline">
             Idea Anvil
           </span>
         </button>
@@ -29,13 +29,15 @@ export function Header({ onHistoryOpen, onNewSession }: HeaderProps) {
           className="cursor-pointer text-zinc-600 transition-colors duration-300 hover:text-zinc-200"
         >
           <Plus className="size-3" />
-          <span className="text-xs">New</span>
+          <span className="hidden text-xs sm:inline">New</span>
         </Button>
       </div>
 
-      <PhaseIndicator />
+      <div className="min-w-0 flex-1 px-2 sm:px-4">
+        <PhaseIndicator />
+      </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <Button
           variant="ghost"
           size="icon-sm"
